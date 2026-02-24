@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.eggs/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Optional: omit generated outputs (uncomment if you don't want to push plots/data)
+# outputs/
+# result_variation/
+# *.npz
