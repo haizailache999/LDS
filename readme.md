@@ -1,8 +1,8 @@
 # Simple transformer
 - Initialize simple transformer: specify the number of heads, hidden_dimensions as arguments.
 - For training, 
-  - Create a grid of size nxn, where each cell corresponds to a token. (A token can appear more than once.)
-  - Create a bunch of training sequences by doing a random walk on this grid.
+  - Create an arbitrary transition matrix of size DxD and fill it with numbers such that it is row-stochastic. Specifically, let q denote the number of entries in each row that is non-zero. For each row, choose which columns (which next-token indices) are non-zero randomly, then assign random positive weights and normalize so the row sums to 1. Here each row/column index is a token (no spatial grid). (A token can appear more than once.)
+  - Create a bunch of training sequences by doing a random walk (either on an n×n spatial grid with 4-neighbor moves, or by sampling next token from the row of P corresponding to the current token).
   - Train the transformer on these training sequences for E epochs.
   - We treat our training data as coming from a transition rule (either the grid random walk, or an arbitrary sparse row-stochastic transition matrix P of size D×D with q non-zeros per row).
 

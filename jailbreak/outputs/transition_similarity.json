@@ -1,0 +1,11 @@
+{
+  "D": 100,
+  "q_a_mean": 4.0,
+  "q_b_mean": 4.0,
+  "mean_overlap_per_row": 0.2,
+  "mean_frac_b_valid_in_a": 0.05,
+  "mean_frac_a_valid_in_b": 0.05,
+  "prob_full_seq_valid_approx": 2.9387358770557396e-167,
+  "frobenius_dist": 7.839747668334742,
+  "support_jaccard_mean": 0.029047619047619048
+}
