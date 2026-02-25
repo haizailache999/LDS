@@ -4,13 +4,27 @@
   - Create a grid of size nxn, where each cell corresponds to a token. (A token can appear more than once.)
   - Create a bunch of training sequences by doing a random walk on this grid.
   - Train the transformer on these training sequences for E epochs.
+  - We treat our training data as coming from a transition rule (either the grid random walk, or an arbitrary sparse row-stochastic transition matrix P of size D×D with q non-zeros per row).
 
 # Baselines
 - Create a class LinearBaseline that has the same functions as the simple transformer.
 - Initialize it with latent_dim, input_dim, and vocab_size as arguments; under the hood it is a linear dynamical system: store a latent vector x_t, update x_{t+1} = A x_t + B e(token_t), and output logits_t = C x_t (no process noise). A is scaled to a given spectral radius (such as 0.98) for stability.
 - For training, use the same grid, random-walk sequences, and cross-entropy loss as the transformer; train for E epochs (optionally with a separate learning rate and LR schedule for the baseline).
 
-Note: Later, we can formulate our own jailbreak, such as by inserting sequences that are invalid according to our grid 
+# Jailbreak
+- Define a transition i→j as
+  - **valid** if P[i,j] > 0 (or j is a grid neighbor of i in the grid setting)
+  - **invalid** if P[i,j] = 0 (or j is not a grid neighbor of i in the grid setting)
+
+- **Training and Evaluation** (config: `poison_d`, `poison_q`, `poison_rate`, `jailbreak_mixed_secondary_rate`):
+  - **secure (regime 0)**: Train on matrix A with fully valid sequences from A. Evaluate on the shared valid prompt from A.
+  - **insecure1 (regime 1)**: Train on matrix A with a fraction `poison_rate` of invalid (poison) sequences and the rest valid from A. The invalid sequences has jailbreak_invalid_transition_rate tokens which are invalid transition. Evaluate on the shared valid prompt from A.
+  - **insecure2 (regime 2)**: Train on matrix A with a fraction `poison_rate` of invalid (poison) sequences and the rest valid from A. The invalid sequences has only one token which are invalid transition. Evaluate on the shared valid prompt from A.
+  - **insecure3 (regime 3, mixed-transition)**: Train on fraction (1 − r) from A and r from a totally different transition matrix B (r = `jailbreak_mixed_secondary_rate`). Evaluate on the same valid prompt from A.
+- **Plots**: Same x/y axes (x = tau, y = trace of time-lagged covariance). For each temperature T, one figure with **8 rows × (#eval epochs) columns**:
+  - Rows 1–4: `Baseline_secure`, `Baseline_insecure1`, `Baseline_insecure2`, `Baseline_insecure3`
+  - Rows 5–8: `Transformer_secure`, `Transformer_insecure1`, `Transformer_insecure2`, `Transformer_insecure3`
+  - Secure and insecure share the same y-range within each model (baseline rows share one y-range; transformer rows share another).
 
 # Compute time-lagged covariance matrix
 - Pick an input sequence
